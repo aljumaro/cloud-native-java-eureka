@@ -1,4 +1,4 @@
-package com.aljumaro.test.eurekaedge;
+package com.aljumaro.test.eurekaedge.clr;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -6,9 +6,8 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.cloud.client.serviceregistry.Registration;
-import org.springframework.stereotype.Component;
 
-@Component
+//@Component
 public class DiscoveryClientCLR implements CommandLineRunner {
 
 	private final Log log = LogFactory.getLog(getClass());

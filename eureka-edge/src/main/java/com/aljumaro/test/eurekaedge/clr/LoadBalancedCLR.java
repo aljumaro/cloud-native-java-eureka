@@ -1,4 +1,4 @@
-package com.aljumaro.test.eurekaedge;
+package com.aljumaro.test.eurekaedge.clr;
 
 import java.util.Collections;
 import java.util.Map;
@@ -7,12 +7,11 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
-@Component
+//@Component
 public class LoadBalancedCLR implements CommandLineRunner {
 
 	private final Log log = LogFactory.getLog(getClass());
