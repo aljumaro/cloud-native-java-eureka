@@ -2,3 +2,15 @@ spring:
   profiles:
     active:
     - feign
+    
+management:
+  security:
+    enabled: false
+    
+zuul:
+  routes:
+    greeting-service:
+      path: /lets/**
+      serviceId: greeting-service 
+  ignored-services:
+    greeting-service
