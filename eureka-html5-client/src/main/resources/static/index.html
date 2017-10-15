@@ -1,1 +1,31 @@
-index
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <title>Demo</title>
+    <meta name="description" content=""/>
+    <meta name="viewport" content="width=device-width"/>
+    <base href="/"/>
+</head>
+<body>
+
+<div id="message"></div>
+
+<script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+<script>
+
+    
+    var greetingsClientUrl = location.protocol + "//" + window.location.host
+        + "/greeting-client-uri";
+    $.ajax({url: greetingsClientUrl}).done(function (data) {
+        var greetingsServiceUrl = data['uri'] + "/lets/hi/juan";
+        console.log('greetingsServiceUrl: ' + greetingsServiceUrl);
+        
+        $.ajax({url: greetingsServiceUrl}).done(function (greeting) {
+            $("#message").html(greeting['greeting']);
+        });
+    });
+</script>
+</body>
+</html>

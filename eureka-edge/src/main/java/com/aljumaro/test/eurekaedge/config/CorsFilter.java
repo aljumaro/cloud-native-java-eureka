@@ -1,11 +1,11 @@
-package com.aljumaro.test.eurekaedge;
+package com.aljumaro.test.eurekaedge.config;
 
 import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
+import java.util.function.Predicate;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -21,7 +21,6 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.cloud.client.discovery.event.HeartbeatEvent;
-import org.springframework.context.annotation.Profile;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -29,7 +28,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
-@Profile("cors")
 @Component
 @Order(Ordered.HIGHEST_PRECEDENCE + 10)
 public class CorsFilter implements Filter {
@@ -69,27 +67,34 @@ public class CorsFilter implements Filter {
 		if (StringUtils.hasText(origin)) {
 			URI originUri = URI.create(origin);
 			int port = originUri.getPort();
-			String match = originUri.getHost() + ':' + (port <= 0 ? 80 : port);
 
-			this.catalog.forEach((k, v) -> {
-				String collect = v.stream().map(si -> si.getHost() + ':' + si.getPort() + '(' + si.getServiceId() + ')')
-						.collect(Collectors.joining());
-			});
-
-			boolean svcMatch = this.catalog.keySet().stream().anyMatch(serviceId -> this.catalog.get(serviceId).stream()
-					.map(si -> si.getHost() + ':' + si.getPort()).anyMatch(hp -> hp.equalsIgnoreCase(match)));
-			return svcMatch;
+			return this.catalog.keySet().stream()
+					.anyMatch(matchesServiceURL(originUri.getHost() + ':' + (port <= 0 ? 80 : port)));
 		}
 		return false;
 	}
 
+	private Predicate<? super String> matchesServiceURL(String match) {
+		// @formatter:off
+		
+		return serviceId -> this.catalog.get(serviceId).stream().map(si -> si.getHost() + ':' + si.getPort())
+				.anyMatch(hp -> hp.equalsIgnoreCase(match));
+
+		// @formatter:on
+	}
+
 	@EventListener(HeartbeatEvent.class)
 	void onHeartbeatEvent(HeartbeatEvent event) {
+		log.info("Refreshing catalog");
 		this.refreshCatalog();
 	}
 
 	private void refreshCatalog() {
-		discoveryClient.getServices().forEach(svc -> this.catalog.put(svc, this.discoveryClient.getInstances(svc)));
+		discoveryClient.getServices().forEach(svc -> {
+			List<ServiceInstance> instances = this.discoveryClient.getInstances(svc);
+			instances.stream().map(si -> si.getServiceId()).forEach(log::info);
+			this.catalog.put(svc, instances);
+		});
 	}
 
 	// @formatter:off

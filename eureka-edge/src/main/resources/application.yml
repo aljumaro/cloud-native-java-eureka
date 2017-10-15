@@ -13,4 +13,4 @@ zuul:
       path: /lets/**
       serviceId: greeting-service 
   ignored-services:
-    greeting-service
+    greeting-service,html5-client
