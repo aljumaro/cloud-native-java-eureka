@@ -3,9 +3,14 @@ spring:
     name: greeting-service
     
 server:
-  port: ${PORT:0}
+  port: ${PORT:8083}
   
 eureka:
   instance:
     instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
+
+security:
+  oauth2:
+    resource:
+      user-info-uri: http://auth-service/uaa/user
       
